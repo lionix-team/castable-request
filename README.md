@@ -1,6 +1,6 @@
 # Laravel Castable Request
 
-This package exposes a request validation rule that applies a cast to the request input just like the eloquent casts.
+This package applies eloquent model casts to the request input.
 
 ## Installation
 
@@ -9,9 +9,9 @@ This package exposes a request validation rule that applies a cast to the reques
 ## Todo
 
 - [ ] Setup composer dependencies and testing environment.
-- [ ] Implement replacer with casts given as string or classname.
-- [ ] Implement validation rule handler/controller that will delegate a replacer.
-- [ ] Create service provider that will extend Laravel's validator with `cast` rule.
+- [ ] Implement request input caster with casts given as string or classname.
+- [ ] Implement cast registry in which user can register global casts that will apply to all requests.
+- [ ] Create service provider that will register request casts to the global registry and apply them when request is resolved.
 - [ ] Complete [Installation](#installation) readme section.
 - [ ] Complete [Usage](#usage) readme section.
 - [ ] Publish composer package.
