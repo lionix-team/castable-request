@@ -1,0 +1,46 @@
+{
+    "name": "lionix/castable-request",
+    "description": "Laravel castable request validation rule",
+    "keywords": [
+        "laravel",
+        "request",
+        "validation",
+        "cast"
+    ],
+    "type": "library",
+    "minimum-stability": "dev",
+    "require": {
+        "php": "^7.2.5"
+    },
+    "require-dev": {
+        "mockery/mockery": "^1.4",
+        "orchestra/testbench": "^7.0@dev",
+        "phpunit/phpunit": "^8.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lionix\\CastableRequest\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Lionix\\CastableRequest\\Tests\\": "tests"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Lionix\\CastableRequest\\ServiceProvider"
+            ]
+        }
+    },
+    "authors": [
+        {
+            "name": "vaawebdev",
+            "email": "vaawebdev@gmail.com"
+        }
+    ]
+}

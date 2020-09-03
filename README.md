@@ -8,7 +8,7 @@ This package exposes a request validation rule that applies a cast to the reques
 
 ## Todo
 
-- [ ] Setup composer dependencies and testing environment.
+- [x] Setup composer dependencies and testing environment.
 - [ ] Implement replacer with casts given as string or classname.
 - [ ] Implement validation rule handler/controller that will delegate a replacer.
 - [ ] Create service provider that will extend Laravel's validator with `cast` rule.
