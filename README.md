@@ -9,9 +9,10 @@ This package applies eloquent model casts to the request input.
 ## Todo
 
 - [x] Setup composer dependencies and testing environment.
-- [ ] Implement request input caster with casts given as string or classname.
+- [ ] Implement input caster with casts given as string or classname.
+- [ ] Implement request input caster.
 - [ ] Implement cast registry in which user can register global casts that will apply to all requests.
-- [ ] Create service provider that will register request casts to the global registry and apply them when request is resolved.
+- [ ] Implement service provider that will apply cast registry casts to the requests.
 - [ ] Complete [Installation](#installation) readme section.
 - [ ] Complete [Usage](#usage) readme section.
 - [ ] Publish composer package.
