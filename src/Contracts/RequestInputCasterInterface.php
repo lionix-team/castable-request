@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 interface RequestInputCasterInterface
 {
     /**
-     * Cast request input attribute to a given cast.
+     * Cast request input attribute to a given cast type.
      *
      * @param \Illuminate\Http\Request $request
      * @param string $attribute

@@ -2,7 +2,7 @@
 
 namespace Lionix\CastableRequest\Contracts;
 
-interface CastableRequest
+interface CastableRequestInterface
 {
     /**
      * Get request casts.
