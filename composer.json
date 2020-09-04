@@ -8,13 +8,14 @@
         "cast"
     ],
     "type": "library",
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "require": {
-        "php": "^7.2.5"
+        "php": "^7.2.5",
+        "laravel/framework": ">=7.0"
     },
     "require-dev": {
         "mockery/mockery": "^1.4",
-        "orchestra/testbench": "^7.0@dev",
+        "orchestra/testbench": "^5.5",
         "phpunit/phpunit": "^8.5"
     },
     "autoload": {
