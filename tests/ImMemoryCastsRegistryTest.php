@@ -3,21 +3,21 @@
 namespace Lionix\CastableRequest\Tests;
 
 use Illuminate\Foundation\Testing\WithFaker;
-use Lionix\CastableRequest\CastsRegistry;
+use Lionix\CastableRequest\ImMemoryCastsRegistry;
 
 class CastsRegistryTest extends TestCase
 {
     use WithFaker;
 
     /**
-     * @var \Lionix\CastableRequest\CastsRegistry
+     * @var \Lionix\CastableRequest\ImMemoryCastsRegistry
      */
     private $registry;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->registry = $this->app->make(CastsRegistry::class);
+        $this->registry = $this->app->make(ImMemoryCastsRegistry::class);
     }
 
     public function testRegisterAndGetAll()

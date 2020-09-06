@@ -2,6 +2,7 @@
 
 namespace Lionix\CastableRequest;
 
+use Closure;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\ServiceProvider as IlluminateServiceProvider;
@@ -18,7 +19,7 @@ class ServiceProvider extends IlluminateServiceProvider
      */
     public $bindings = [
         RequestInputCasterInterface::class => RequestInputCaster::class,
-        CasterInterface::class => ModelCaster::class,
+        CasterInterface::class => EloquentModelCaster::class,
     ];
 
     /**
@@ -27,18 +28,31 @@ class ServiceProvider extends IlluminateServiceProvider
      * @var array
      */
     public $singletons = [
-        CastsRegistryInterface::class => CastsRegistry::class,
+        CastsRegistryInterface::class => ImMemoryCastsRegistry::class,
     ];
 
     /**
-     * Bind form request after resolving handler.
+     * Bind form request resolving handlers.
      *
      * @return void
      */
     public function boot()
     {
-        $this->app->afterResolving(FormRequest::class, function (FormRequest $request, Application $app) {
-            $app->call(FormRequestAfterResolvingHandler::class . '@handle', compact('request'));
-        });
+        $this->app->resolving(FormRequest::class, $this->handler(FormRequestResolvingHandler::class));
+        $this->app->afterResolving(FormRequest::class, $this->handler(FormRequestAfterResolvingHandler::class));
+    }
+
+    /**
+     * Request resolving bindings shorthand.
+     *
+     * @param string $handler
+     *
+     * @return \Closure
+     */
+    private function handler(string $handler): Closure
+    {
+        return function (FormRequest $request, Application $app) use ($handler) {
+            $app->call($handler . '@handle', compact('request'));
+        };
     }
 }

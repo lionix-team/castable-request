@@ -3,10 +3,10 @@
 namespace Lionix\CastableRequest\Tests;
 
 use Illuminate\Foundation\Testing\WithFaker;
-use Lionix\CastableRequest\ModelCaster;
+use Lionix\CastableRequest\EloquentModelCaster;
 use ReflectionObject;
 
-class ModelCasterTest extends TestCase
+class EloquentModelCasterTest extends TestCase
 {
     use WithFaker;
 
@@ -18,7 +18,7 @@ class ModelCasterTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->caster = $this->app->make(ModelCaster::class);
+        $this->caster = $this->app->make(EloquentModelCaster::class);
     }
 
     public function testCastPrimivesUsingEloquentCastAttributeMethod()
@@ -43,11 +43,5 @@ class ModelCasterTest extends TestCase
 
             $this->assertSame($castableResult, $eloquentResult);
         }
-    }
-
-    public function testCastWithEloquentCastAttributesClassName()
-    {
-        $value = $this->faker->realText(10);
-        $this->assertSame($this->caster->cast($value, Cast::class), [$value]);
     }
 }

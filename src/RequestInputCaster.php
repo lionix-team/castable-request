@@ -45,10 +45,8 @@ class RequestInputCaster implements RequestInputCasterInterface
      *
      * @return array
      */
-    protected function resolveRequestAttributes(
-        Request $request,
-        string $attribute
-    ): array{
+    protected function resolveRequestAttributes(Request $request, string $attribute): array
+    {
         if (!str_contains($attribute, '.*')) {
             return $request->has($attribute) ? Arr::wrap($attribute) : [];
         }
