@@ -1,10 +1,9 @@
 {
     "name": "lionix/castable-request",
-    "description": "Laravel castable request validation rule",
+    "description": "Laravel castable requests",
     "keywords": [
         "laravel",
         "request",
-        "validation",
         "cast"
     ],
     "type": "library",
