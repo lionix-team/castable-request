@@ -32,6 +32,10 @@
     "config": {
         "sort-packages": true
     },
+    "scripts": {
+        "test": "phpunit",
+        "lint": "phpcs ./src"
+    },
     "extra": {
         "laravel": {
             "providers": [
