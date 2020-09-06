@@ -6,10 +6,11 @@ use Illuminate\Foundation\Http\FormRequest;
 use Lionix\CastableRequest\Contracts\CastsRegistryInterface;
 use Lionix\CastableRequest\Contracts\RequestInputCasterInterface;
 use Lionix\CastableRequest\FormRequestAfterResolvingHandler;
+use Lionix\CastableRequest\FormRequestResolvingHandler;
 use Mockery;
 use Mockery\MockInterface;
 
-class FormRequestAfterResolvingHandlerTest extends TestCase
+class FormRequestResolvingHandlerTest extends TestCase
 {
     /**
      * @var \Mockery\MockInterface
@@ -33,10 +34,10 @@ class FormRequestAfterResolvingHandlerTest extends TestCase
         $this->caster = Mockery::mock(RequestInputCasterInterface::class);
         $this->app->instance(RequestInputCasterInterface::class, $this->caster);
         $this->app->instance(CastsRegistryInterface::class, $this->registry);
-        $this->handler = $this->app->make(FormRequestAfterResolvingHandler::class);
+        $this->handler = $this->app->make(FormRequestResolvingHandler::class);
     }
 
-    public function testCastAttributesUsingTheRegistry()
+    public function testAddRequestCastsToTheRegistry()
     {
         $casts = [
             'one' => 'string',
@@ -44,13 +45,12 @@ class FormRequestAfterResolvingHandlerTest extends TestCase
             'three' => 'array',
         ];
 
-        $this->registry->shouldReceive('all')->once()->andReturn($casts);
-
-        $request = Mockery::mock(CastableRequest::class)->makePartial();
-
         foreach ($casts as $attribute => $cast) {
-            $this->caster->shouldReceive('castAttribute')->once()->withArgs([$request, $attribute, $cast]);
+            $this->registry->shouldReceive('register')->once()->withArgs([$attribute, $cast]);
         }
+
+        $request = Mockery::mock(CastableRequest::class);
+        $request->shouldReceive('casts')->once()->andReturn($casts);
 
         $this->handler->handle($request);
     }
