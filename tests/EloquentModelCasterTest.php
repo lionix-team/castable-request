@@ -44,10 +44,4 @@ class EloquentModelCasterTest extends TestCase
             $this->assertSame($castableResult, $eloquentResult);
         }
     }
-
-    public function testCastWithEloquentCastAttributesClassName()
-    {
-        $value = $this->faker->realText(10);
-        $this->assertSame($this->caster->cast($value, Cast::class), [$value]);
-    }
 }

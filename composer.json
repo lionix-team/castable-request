@@ -11,11 +11,11 @@
     "minimum-stability": "stable",
     "require": {
         "php": "^7.2.5",
-        "laravel/framework": ">=7.0"
+        "laravel/framework": ">=6.0.2"
     },
     "require-dev": {
         "mockery/mockery": "^1.4",
-        "orchestra/testbench": "^5.5",
+        "orchestra/testbench": "^4.8",
         "phpunit/phpunit": "^8.5"
     },
     "autoload": {
