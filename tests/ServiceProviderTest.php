@@ -3,6 +3,7 @@
 namespace Lionix\CastableRequest\Tests;
 
 use Lionix\CastableRequest\FormRequestAfterResolvingHandler;
+use Lionix\CastableRequest\FormRequestResolvingHandler;
 use Mockery;
 
 class ServiceProviderTest extends TestCase
@@ -25,13 +26,16 @@ class ServiceProviderTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->handler = Mockery::mock(FormRequestAfterResolvingHandler::class);
-        $this->app->instance(FormRequestAfterResolvingHandler::class, $this->handler);
+        $this->resolvingHandler = Mockery::mock(FormRequestResolvingHandler::class);
+        $this->afterResolvingHandler = Mockery::mock(FormRequestAfterResolvingHandler::class);
+        $this->app->instance(FormRequestResolvingHandler::class, $this->resolvingHandler);
+        $this->app->instance(FormRequestAfterResolvingHandler::class, $this->afterResolvingHandler);
     }
 
     public function testBindFormRequestAfterResolvingHandler()
     {
-        $this->handler->shouldReceive('handle')->with(Mockery::type(CastableRequest::class));
+        $this->resolvingHandler->shouldReceive('handle')->with(Mockery::type(CastableRequest::class));
+        $this->afterResolvingHandler->shouldReceive('handle')->with(Mockery::type(CastableRequest::class));
         $this->app->make(CastableRequest::class);
     }
 }
