@@ -5,7 +5,7 @@ namespace Lionix\CastableRequest;
 use Illuminate\Database\Eloquent\Model;
 use Lionix\CastableRequest\Contracts\CasterInterface;
 
-class ModelCaster extends Model implements CasterInterface
+class EloquentModelCaster extends Model implements CasterInterface
 {
     /**
      * Use eloquent casting to cast the given value.

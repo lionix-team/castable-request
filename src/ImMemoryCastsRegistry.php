@@ -4,7 +4,7 @@ namespace Lionix\CastableRequest;
 
 use Lionix\CastableRequest\Contracts\CastsRegistryInterface;
 
-class CastsRegistry implements CastsRegistryInterface
+class ImMemoryCastsRegistry implements CastsRegistryInterface
 {
     /**
      * @var array

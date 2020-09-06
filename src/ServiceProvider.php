@@ -19,7 +19,7 @@ class ServiceProvider extends IlluminateServiceProvider
      */
     public $bindings = [
         RequestInputCasterInterface::class => RequestInputCaster::class,
-        CasterInterface::class => ModelCaster::class,
+        CasterInterface::class => EloquentModelCaster::class,
     ];
 
     /**
@@ -28,7 +28,7 @@ class ServiceProvider extends IlluminateServiceProvider
      * @var array
      */
     public $singletons = [
-        CastsRegistryInterface::class => CastsRegistry::class,
+        CastsRegistryInterface::class => ImMemoryCastsRegistry::class,
     ];
 
     /**
