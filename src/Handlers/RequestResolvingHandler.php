@@ -1,12 +1,12 @@
 <?php
 
-namespace Lionix\CastableRequest;
+namespace Lionix\CastableRequest\Handlers;
 
-use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
 use Lionix\CastableRequest\Contracts\CastableRequestInterface;
 use Lionix\CastableRequest\Contracts\CastsRegistryInterface;
 
-class FormRequestResolvingHandler
+class RequestResolvingHandler
 {
     /**
      * @var \Lionix\CastableRequest\Contracts\CastsRegistryInterface
@@ -24,11 +24,11 @@ class FormRequestResolvingHandler
     /**
      * Register request casts.
      *
-     * @param \Illuminate\Foundation\Http\FormRequest $request
+     * @param \Illuminate\Http\Request $request
      *
      * @return void
      */
-    public function handle(FormRequest $request): void
+    public function handle(Request $request): void
     {
         if ($request instanceof CastableRequestInterface) {
             foreach ($request->casts() as $attribute => $cast) {
