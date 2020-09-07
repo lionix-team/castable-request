@@ -6,6 +6,7 @@
         "request",
         "cast"
     ],
+    "license": "MIT",
     "type": "library",
     "minimum-stability": "stable",
     "require": {
