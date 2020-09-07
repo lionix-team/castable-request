@@ -1,5 +1,8 @@
 # Laravel Castable Request
 
+[![Version](https://poser.pugx.org/lionix/castable-request/version)](//packagist.org/packages/lionix/castable-request)
+[![Total Downloads](https://poser.pugx.org/lionix/castable-request/downloads)](//packagist.org/packages/lionix/castable-request)
+
 This package applies eloquent model casts to the request input.
 
 ## Installation
@@ -98,16 +101,7 @@ class AppServiceProvider extends ServiceProvider
 
 ## Todo
 
-- [x] Setup composer dependencies and testing environment.
-- [x] Implement input caster with casts given as string or classname.
-- [x] Implement request input caster.
-- [x] Implement cast registry in which user can register global casts that will apply to all requests.
-- [x] Implement service provider that will apply cast registry casts to the requests.
-- [x] Complete [Installation](#installation) readme section.
-- [x] Complete [Usage](#usage) readme section.
-- [ ] Publish composer package.
-- [ ] Intergate all fancy readme badges.
-- [ ] Create [Medium](https://medium.com/) article with brief package review.
+- [ ] Add global request casts support for facades and `request` helper.
 
 ## Credits
 
