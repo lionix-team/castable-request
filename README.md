@@ -1,7 +1,3 @@
----
-description: 'https://packagist.org/packages/lionix/castable-request'
----
-
 # Laravel Castable Request
 
 [![Version](https://poser.pugx.org/lionix/castable-request/version)](https://github.com/lionix-team/castable-request/tree/7cd10bf9411f8ae3f9deaad918ae498a49b7db4f/packagist.org/packages/lionix/castable-request/README.md) [![Total Downloads](https://poser.pugx.org/lionix/castable-request/downloads)](https://github.com/lionix-team/castable-request/tree/7cd10bf9411f8ae3f9deaad918ae498a49b7db4f/packagist.org/packages/lionix/castable-request/README.md)
