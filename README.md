@@ -1,20 +1,22 @@
+---
+description: 'https://packagist.org/packages/lionix/castable-request'
+---
+
 # Laravel Castable Request
 
-[![Version](https://poser.pugx.org/lionix/castable-request/version)](//packagist.org/packages/lionix/castable-request)
-[![Total Downloads](https://poser.pugx.org/lionix/castable-request/downloads)](//packagist.org/packages/lionix/castable-request)
+[![Version](https://poser.pugx.org/lionix/castable-request/version)](https://github.com/lionix-team/castable-request/tree/7cd10bf9411f8ae3f9deaad918ae498a49b7db4f/packagist.org/packages/lionix/castable-request/README.md) [![Total Downloads](https://poser.pugx.org/lionix/castable-request/downloads)](https://github.com/lionix-team/castable-request/tree/7cd10bf9411f8ae3f9deaad918ae498a49b7db4f/packagist.org/packages/lionix/castable-request/README.md)
 
 This package applies eloquent model casts to the request input.
 
 ## Installation
 
-```
+```text
 composer require lionix/castable-request
 ```
 
 ## Usage
 
-Implement `Lionix\CastableRequest\Contracts\CastableRequestInterface` in your Request class.
-You will have to declare `casts` method that will return the attributes that should be casted just like you would do it with [eloquent attribute casting](https://laravel.com/docs/7.x/eloquent-mutators#attribute-casting).
+Implement `Lionix\CastableRequest\Contracts\CastableRequestInterface` in your Request class. You will have to declare `casts` method that will return the attributes that should be casted just like you would do it with [eloquent attribute casting](https://laravel.com/docs/7.x/eloquent-mutators#attribute-casting).
 
 ```php
 namespace App\Http\Requests;
@@ -101,9 +103,10 @@ class AppServiceProvider extends ServiceProvider
 
 ## Todo
 
-- [ ] Add global request casts support for facades and `request` helper.
+* [ ] Add global request casts support for facades and `request` helper.
 
 ## Credits
 
-- [Stas Vartanyan](https://github.com/vaawebdev)
-- [Lionix Team](https://github.com/lionix-team)
+* [Stas Vartanyan](https://github.com/vaawebdev)
+* [Lionix Team](https://github.com/lionix-team)
+
