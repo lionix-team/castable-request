@@ -10,13 +10,13 @@
     "type": "library",
     "minimum-stability": "stable",
     "require": {
-        "php": "^7.2.5",
-        "laravel/framework": ">=6.0.2"
+        "php": "^7.2.5|^8.0",
+        "laravel/framework": ">=6.20.12"
     },
     "require-dev": {
         "mockery/mockery": "^1.4",
         "orchestra/testbench": "^4.8",
-        "phpunit/phpunit": "^8.5",
+        "phpunit/phpunit": "^9.3.3",
         "squizlabs/php_codesniffer": "^3.5"
     },
     "autoload": {
