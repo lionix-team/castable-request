@@ -4,6 +4,8 @@
 
 This package applies eloquent model casts to the request input.
 
+> Laravel SaaS Boilerplate - [Larafast](https://larafast.com)
+
 ## Installation
 
 ```text
