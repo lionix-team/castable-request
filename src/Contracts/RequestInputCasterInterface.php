@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Lionix\CastableRequest\Contracts;
 
 use Illuminate\Http\Request;
@@ -7,13 +9,14 @@ use Illuminate\Http\Request;
 interface RequestInputCasterInterface
 {
     /**
-     * Cast request input attribute to a given cast type.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param string $attribute
-     * @param string $cast
-     *
-     * @return void
+     * Cast a single request input attribute.
      */
-    public function castAttribute(Request $request, string $attribute, string $cast);
+    public function castAttribute(Request $request, string $attribute, string $cast): void;
+
+    /**
+     * Cast the request input attributes.
+     *
+     * @param  array<string, string>  $casts
+     */
+    public function castAttributes(Request $request, array $casts): void;
 }

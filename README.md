@@ -1,56 +1,70 @@
 # Laravel Castable Request
 
-[![Version](https://poser.pugx.org/lionix/castable-request/version)](https://github.com/lionix-team/castable-request/tree/7cd10bf9411f8ae3f9deaad918ae498a49b7db4f/packagist.org/packages/lionix/castable-request/README.md) [![Total Downloads](https://poser.pugx.org/lionix/castable-request/downloads)](https://github.com/lionix-team/castable-request/tree/7cd10bf9411f8ae3f9deaad918ae498a49b7db4f/packagist.org/packages/lionix/castable-request/README.md)
+[![Latest Version](https://img.shields.io/packagist/v/lionix/castable-request.svg)](https://packagist.org/packages/lionix/castable-request)
+[![Tests](https://github.com/lionix-team/castable-request/actions/workflows/php.yml/badge.svg)](https://github.com/lionix-team/castable-request/actions/workflows/php.yml)
+[![Total Downloads](https://img.shields.io/packagist/dt/lionix/castable-request.svg)](https://packagist.org/packages/lionix/castable-request)
+[![License](https://img.shields.io/packagist/l/lionix/castable-request.svg)](LICENSE)
 
-This package applies eloquent model casts to the request input.
+Apply [Eloquent attribute casts](https://laravel.com/docs/eloquent-mutators#attribute-casting) to your form request input. Dates become `Carbon` instances, `"1"` becomes `true`, enum values become enum cases, and so on, before the input reaches your controller.
 
 > Laravel SaaS Boilerplate - [Larafast](https://larafast.com)
 
+## Requirements
+
+| Package | PHP        | Laravel        |
+|---------|------------|----------------|
+| 2.x     | 8.2 – 8.5  | 11.x, 12.x, 13.x |
+| 1.x     | 7.2 – 8.0  | 6.x – 8.x      |
+
+Laravel 13 requires PHP 8.3 or newer.
+
 ## Installation
 
-```text
+```bash
 composer require lionix/castable-request
 ```
 
+The service provider is registered automatically through package discovery.
+
 ## Usage
 
-Implement `Lionix\CastableRequest\Contracts\CastableRequestInterface` in your Request class. You will have to declare `casts` method that will return the attributes that should be casted just like you would do it with [eloquent attribute casting](https://laravel.com/docs/7.x/eloquent-mutators#attribute-casting).
+Implement `Lionix\CastableRequest\Contracts\CastableRequestInterface` on your form request and return the casts from a `casts()` method, just like you would on an Eloquent model.
 
 ```php
 namespace App\Http\Requests;
 
+use App\Enums\PostStatus;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Lionix\CastableRequest\Contracts\CastableRequestInterface;
 
 class PostsIndexRequest extends FormRequest implements CastableRequestInterface
 {
-    /**
-     * Get request casts.
-     *
-     * @return array
-     */
     public function casts(): array
     {
         return [
             'created_after' => 'date',
+            'status' => PostStatus::class,
+            'with_trashed' => 'boolean',
+            'per_page' => 'integer',
+            'tags.*' => 'string',
+            'filters.*.value' => 'float',
         ];
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'created_after' => 'date',
+            'created_after' => ['sometimes', 'date'],
+            'status' => ['sometimes', Rule::enum(PostStatus::class)],
+            'with_trashed' => ['sometimes', 'boolean'],
+            'per_page' => ['sometimes', 'integer', 'max:100'],
         ];
     }
 }
 ```
 
-The package will do all the magic and when you access the request `created_after` attribute, in this case, it will be casted to an `Illuminate\Support\Carbon` instance.
+The casted values are available through the usual request methods (`input()`, `all()`, `get()`, property access, …):
 
 ```php
 namespace App\Http\Controllers;
@@ -61,23 +75,55 @@ class PostsController extends Controller
 {
     public function index(PostsIndexRequest $request)
     {
-        $createdAfterDiff = $request->input('created_after')->diffForHumans();
-        // Example value: 1 month from now
+        $request->input('created_after');   // Illuminate\Support\Carbon
+        $request->input('status');          // App\Enums\PostStatus
+        $request->input('with_trashed');    // bool
+        $request->validated('per_page');    // int
     }
 }
 ```
 
-All default eloquent models castings are available.
+### How it works
 
-Starting from the **Laravel 7.x** you can define your own [custom casts](https://laravel.com/docs/7.x/eloquent-mutators#custom-casts) and use it in the request as well.
+1. The form request is resolved and **validated against the raw input**, so invalid values produce the usual `422` validation errors instead of casting exceptions.
+2. Once validation has passed, the casts are applied to the request input.
+3. The validator's data is updated too, so `$request->validated()` and `$request->safe()` also return the casted values.
 
-### Global request casts
+Because casting happens after validation, write your rules for the raw input, e.g. `Rule::enum(PostStatus::class)` for an enum cast or `date` for a date cast.
 
-If you want to declare casts that will be applied globally without having to define it in each Request class you can use the `Lionix\CastableRequest\Contracts\CastsRegistryInterface` in your service provider and register global casts.
+### Supported casts
+
+Every cast Eloquent supports works here, including:
+
+- Primitives: `int` / `integer`, `float` / `double` / `real`, `decimal:<precision>`, `string`, `bool` / `boolean`
+- Dates: `date`, `datetime`, `immutable_date`, `immutable_datetime`, `timestamp`
+- JSON-like: `array`, `json`, `object`, `collection` (both JSON strings and already-decoded arrays are accepted)
+- Backed enums: `App\Enums\Status::class`
+- [Custom casts](https://laravel.com/docs/eloquent-mutators#custom-casts): any class implementing `CastsAttributes` or `Castable`, including arguments (`Money::class.':EUR'`)
+
+Casts are only applied to attributes that are present in the input. `null` values of present attributes are passed through the cast as Eloquent would (most built-in casts keep `null` as `null`).
+
+### Nested input and wildcards
+
+Attributes use "dot" notation and support `*` wildcards at any level:
 
 ```php
-<?php
+public function casts(): array
+{
+    return [
+        'author.birthday' => 'date',
+        'items.*.price' => 'decimal:2',
+        'items.*.options.*.enabled' => 'boolean',
+        '*.id' => 'integer', // top-level list payloads
+    ];
+}
+```
 
+### Global casts
+
+To apply casts to **every** form request, register them on the `CastsRegistryInterface` singleton, e.g. in a service provider:
+
+```php
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
@@ -85,26 +131,52 @@ use Lionix\CastableRequest\Contracts\CastsRegistryInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap any application services.
-     *
-     * @param \Lionix\CastableRequest\Contracts\CastsRegistryInterface $castRegistry
-     *
-     * @return void
-     */
-    public function boot(CastsRegistryInterface $castRegistry)
+    public function boot(CastsRegistryInterface $casts): void
     {
-        $castRegistry->register('created_after', 'date');
+        $casts->register('created_after', 'date');
+        $casts->register('page', 'integer');
     }
 }
 ```
 
-## Todo
+Global casts are applied to all form requests, whether or not they implement `CastableRequestInterface`. When a request defines a cast for the same attribute, the request's cast wins.
 
-* [ ] Add global request casts support for facades and `request` helper.
+Use `$casts->forget('page')` to remove a global cast and `$casts->all()` to list them.
+
+### Customization
+
+All the moving parts are bound to interfaces in the container, so you can swap any of them:
+
+| Contract | Default implementation | Responsibility |
+|----------|------------------------|----------------|
+| `Contracts\CasterInterface` | `EloquentModelCaster` | Casts a single value |
+| `Contracts\RequestInputCasterInterface` | `RequestInputCaster` | Resolves attribute paths and writes values back to the request |
+| `Contracts\CastsRegistryInterface` | `InMemoryCastsRegistry` (singleton) | Stores global casts |
+
+```php
+$this->app->bind(
+    \Lionix\CastableRequest\Contracts\CasterInterface::class,
+    \App\Support\MyCaster::class,
+);
+```
+
+## Upgrading
+
+See [UPGRADE.md](UPGRADE.md) for upgrading from 1.x to 2.x, and [CHANGELOG.md](CHANGELOG.md) for all notable changes.
+
+## Testing
+
+```bash
+composer test      # PHPUnit
+composer lint      # Laravel Pint (code style)
+composer analyse   # PHPStan / Larastan
+```
 
 ## Credits
 
 * [Stas Vartanyan](https://github.com/vaawebdev)
 * [Lionix Team](https://github.com/lionix-team)
 
+## License
+
+The MIT License (MIT). See [LICENSE](LICENSE) for more information.

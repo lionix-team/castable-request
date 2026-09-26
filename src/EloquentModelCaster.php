@@ -1,23 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Lionix\CastableRequest;
 
-use Illuminate\Database\Eloquent\Model;
 use Lionix\CastableRequest\Contracts\CasterInterface;
+use Lionix\CastableRequest\Support\CastingModel;
 
-class EloquentModelCaster extends Model implements CasterInterface
+class EloquentModelCaster implements CasterInterface
 {
     /**
-     * Use eloquent casting to cast the given value.
+     * Cast the given value using Eloquent attribute casting.
      *
-     * @param mixed $value
-     * @param string $cast
-     *
-     * @return void
+     * A fresh model is used for every value so Eloquent's internal cast
+     * caches never leak between attributes.
      */
-    public function cast($value, string $cast)
+    public function cast(mixed $value, string $cast): mixed
     {
-        $this->casts = ['attr' => $cast];
-        return $this->castAttribute('attr', $value);
+        return (new CastingModel)->castValue($value, $cast);
     }
 }

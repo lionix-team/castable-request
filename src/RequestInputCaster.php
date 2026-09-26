@@ -1,72 +1,94 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Lionix\CastableRequest;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Lionix\CastableRequest\Contracts\CasterInterface;
 use Lionix\CastableRequest\Contracts\RequestInputCasterInterface;
 
 class RequestInputCaster implements RequestInputCasterInterface
 {
-    /**
-     * @var \Lionix\CastableRequest\Contracts\CasterInterface
-     */
-    private $caster;
+    public function __construct(
+        private readonly CasterInterface $caster,
+    ) {}
 
-    /**
-     * @param \Lionix\CastableRequest\Contracts\CasterInterface $caster
-     */
-    public function __construct(CasterInterface $caster)
+    public function castAttribute(Request $request, string $attribute, string $cast): void
     {
-        $this->caster = $caster;
+        $this->castAttributes($request, [$attribute => $cast]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function castAttribute(Request $request, string $attribute, string $cast)
+    public function castAttributes(Request $request, array $casts): void
     {
+        if ($casts === []) {
+            return;
+        }
+
         $input = $request->input();
+        $changed = false;
 
-        foreach ($this->resolveRequestAttributes($request, $attribute) as $attr) {
-            Arr::set($input, $attr, $this->caster->cast(Arr::get($input, $attr), $cast));
+        foreach ($casts as $attribute => $cast) {
+            foreach ($this->resolvePaths($input, $attribute) as $path) {
+                Arr::set($input, $path, $this->caster->cast(Arr::get($input, $path), $cast));
+                $changed = true;
+            }
         }
 
-        $request->replace($input);
+        if ($changed) {
+            $this->replaceInput($request, $input);
+        }
     }
 
     /**
-     * Get all matched request input attributes recursively.
+     * Replace the request input source with the casted input.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param string $attribute
+     * Symfony's InputBag rejects objects such as enums, so the parameters are
+     * written directly instead of going through Request::replace().
      *
-     * @return array
+     * @param  array<array-key, mixed>  $input
      */
-    protected function resolveRequestAttributes(Request $request, string $attribute): array
+    protected function replaceInput(Request $request, array $input): void
     {
-        if (!str_contains($attribute, '.*')) {
-            return $request->has($attribute) ? Arr::wrap($attribute) : [];
+        $source = match (true) {
+            $request->isJson() => $request->json(),
+            in_array($request->getRealMethod(), ['GET', 'HEAD'], true) => $request->query,
+            default => $request->request,
+        };
+
+        (fn () => $this->parameters = $input)->call($source);
+    }
+
+    /**
+     * Expand the given attribute into the concrete input paths it matches.
+     *
+     * @param  array<array-key, mixed>  $input
+     * @return list<string>
+     */
+    protected function resolvePaths(array $input, string $attribute): array
+    {
+        if (! str_contains($attribute, '*')) {
+            return Arr::has($input, $attribute) ? [$attribute] : [];
         }
 
-        $prefix = Str::before($attribute, '.*');
-        $postfix = Str::after($attribute, '.*');
+        [$prefix, $suffix] = explode('*', $attribute, 2);
+        $prefix = rtrim($prefix, '.');
 
-        $input = $request->input($prefix);
+        $items = $prefix === '' ? $input : Arr::get($input, $prefix);
 
-        return !is_array($input) ? [] : collect($input)->keys()->reduce(
-            function ($aggregate, $current) use ($request, $prefix, $postfix) {
-                return array_merge(
-                    $aggregate,
-                    $this->resolveRequestAttributes(
-                        $request,
-                        $prefix . '.' . $current . $postfix
-                    )
-                );
-            },
-            []
-        );
+        if (! is_array($items)) {
+            return [];
+        }
+
+        $paths = [];
+
+        foreach (array_keys($items) as $key) {
+            $path = ($prefix === '' ? '' : $prefix.'.').$key.$suffix;
+
+            array_push($paths, ...$this->resolvePaths($input, $path));
+        }
+
+        return $paths;
     }
 }

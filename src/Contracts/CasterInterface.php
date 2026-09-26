@@ -1,16 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Lionix\CastableRequest\Contracts;
 
 interface CasterInterface
 {
     /**
-     * Cast value with given cast.
-     *
-     * @param mixed $value
-     * @param string $cast
-     *
-     * @return mixed
+     * Cast the given value using the given cast definition.
      */
-    public function cast($value, string $cast);
+    public function cast(mixed $value, string $cast): mixed;
 }

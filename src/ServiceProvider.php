@@ -1,61 +1,43 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Lionix\CastableRequest;
 
-use Closure;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider as IlluminateServiceProvider;
 use Lionix\CastableRequest\Contracts\CasterInterface;
 use Lionix\CastableRequest\Contracts\CastsRegistryInterface;
 use Lionix\CastableRequest\Contracts\RequestInputCasterInterface;
 use Lionix\CastableRequest\Handlers\RequestAfterResolvingHandler;
-use Lionix\CastableRequest\Handlers\RequestResolvingHandler;
 
 class ServiceProvider extends IlluminateServiceProvider
 {
     /**
-     * All of the container bindings that should be registered.
-     *
-     * @var array
+     * @var array<class-string, class-string>
      */
-    public $bindings = [
+    public array $bindings = [
         RequestInputCasterInterface::class => RequestInputCaster::class,
         CasterInterface::class => EloquentModelCaster::class,
     ];
 
     /**
-     * All of the container singletons that should be registered.
-     *
-     * @var array
+     * @var array<class-string, class-string>
      */
-    public $singletons = [
-        CastsRegistryInterface::class => ImMemoryCastsRegistry::class,
+    public array $singletons = [
+        CastsRegistryInterface::class => InMemoryCastsRegistry::class,
     ];
 
-    /**
-     * Bind form request resolving handlers.
-     *
-     * @return void
-     */
-    public function register()
+    public function boot(): void
     {
-        $this->app->resolving(FormRequest::class, $this->handler(RequestResolvingHandler::class));
-        $this->app->afterResolving(FormRequest::class, $this->handler(RequestAfterResolvingHandler::class));
-    }
-
-    /**
-     * Request resolving bindings shorthand.
-     *
-     * @param string $handler
-     *
-     * @return \Closure
-     */
-    private function handler(string $handler): Closure
-    {
-        return function (Request $request, Application $app) use ($handler) {
-            $app->call($handler . '@handle', compact('request'));
-        };
+        // Registered while booting so it runs after Laravel's own form request
+        // validation callback, i.e. input is validated first and casted after.
+        $this->app->afterResolving(
+            FormRequest::class,
+            static function (FormRequest $request, Application $app): void {
+                $app->make(RequestAfterResolvingHandler::class)->handle($request);
+            },
+        );
     }
 }
