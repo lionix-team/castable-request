@@ -1,36 +1,67 @@
-name: PHP Composer
+name: Tests
 
 on:
   push:
-    branches: [master, develop]
-  pull_request:
     branches: [master]
+  pull_request:
 
 jobs:
-  build-lint-and-test:
+  lint:
+    name: Code style & static analysis
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Composer Validate
-        run: composer validate
-
-      - name: Cache Composer Packages
-        id: composer-cache
-        uses: actions/cache@v2
+      - uses: shivammathur/setup-php@v2
         with:
-          path: vendor
-          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-php-
+          php-version: '8.4'
+          coverage: none
 
-      - name: Install Dependencies
-        if: steps.composer-cache.outputs.cache-hit != 'true'
-        run: composer install --prefer-dist --no-progress --no-suggest
+      - name: Validate composer.json
+        run: composer validate --strict
 
-      - name: Run Lint
-        run: composer run-script lint
+      - name: Install dependencies
+        uses: ramsey/composer-install@v3
 
-      - name: Run Tests
-        run: composer run-script test
+      - name: Pint
+        run: composer lint
+
+      - name: PHPStan
+        run: composer analyse
+
+  tests:
+    name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }} (${{ matrix.stability }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3', '8.4', '8.5']
+        laravel: ['12.*', '13.*']
+        stability: [prefer-lowest, prefer-stable]
+        include:
+          - laravel: '12.*'
+            testbench: '10.*'
+          - laravel: '13.*'
+            testbench: '11.*'
+        exclude:
+          - php: '8.2'
+            laravel: '13.*'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          composer remove larastan/larastan laravel/pint --dev --no-interaction --no-update
+          composer require "illuminate/database:${{ matrix.laravel }}" "illuminate/http:${{ matrix.laravel }}" "illuminate/support:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+
+      - name: Run tests
+        run: vendor/bin/phpunit
