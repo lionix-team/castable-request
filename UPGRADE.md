@@ -5,7 +5,7 @@
 ### Requirements
 
 - PHP 8.2 or newer (8.3+ for Laravel 13).
-- Laravel 11.x, 12.x or 13.x.
+- Laravel 12.x or 13.x.
 
 ```bash
 composer require lionix/castable-request:^2.0

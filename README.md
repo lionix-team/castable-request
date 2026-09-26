@@ -13,7 +13,7 @@ Apply [Eloquent attribute casts](https://laravel.com/docs/eloquent-mutators#attr
 
 | Package | PHP        | Laravel        |
 |---------|------------|----------------|
-| 2.x     | 8.2 – 8.5  | 11.x, 12.x, 13.x |
+| 2.x     | 8.2 – 8.5  | 12.x, 13.x     |
 | 1.x     | 7.2 – 8.0  | 6.x – 8.x      |
 
 Laravel 13 requires PHP 8.3 or newer.

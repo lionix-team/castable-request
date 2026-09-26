@@ -12,7 +12,7 @@ See [UPGRADE.md](UPGRADE.md) for migration steps.
 ### Added
 
 - Support for PHP 8.2, 8.3, 8.4 and 8.5.
-- Support for Laravel 11.x, 12.x and 13.x.
+- Support for Laravel 12.x and 13.x.
 - `CastsRegistryInterface::forget()` to remove a global cast.
 - `RequestInputCasterInterface::castAttributes()` to cast several attributes in one pass.
 - Top-level wildcards (e.g. `*.id`) for list payloads.
@@ -23,7 +23,7 @@ See [UPGRADE.md](UPGRADE.md) for migration steps.
 
 ### Changed
 
-- **Breaking:** requires PHP `^8.2` and Laravel `^11.0|^12.0|^13.0`.
+- **Breaking:** requires PHP `^8.2` and Laravel `^12.0|^13.0`.
 - **Breaking:** the package now depends on `illuminate/database`, `illuminate/http` and `illuminate/support` instead of the whole `laravel/framework`.
 - **Breaking:** native parameter and return types added to all contracts:
   - `CasterInterface::cast(mixed $value, string $cast): mixed`
@@ -39,7 +39,7 @@ See [UPGRADE.md](UPGRADE.md) for migration steps.
 ### Removed
 
 - **Breaking:** `Handlers\RequestResolvingHandler`. `Handlers\RequestAfterResolvingHandler` now applies both global and request casts.
-- Support for PHP < 8.2 and Laravel < 11.
+- Support for PHP < 8.2 and Laravel < 12. Laravel 11 is end-of-life and every release has open security advisories, so it is not supported.
 - Committed `composer.lock` and the PHP_CodeSniffer config (replaced by Laravel Pint).
 
 ### Fixed
